@@ -46,8 +46,55 @@
  *   ram.addDelivery("Bandra", "CST");         // => 2
  *   ram.completeDelivery(1);                   // => true
  *   ram.getStats();
- *   // => { name: "Ram", area: "Dadar", total: 2, completed: 1, pending: 1, successRate: "50.00%" }
+//  *   // => { name: "Ram", area: "Dadar", total: 2, completed: 1, pending: 1, successRate: "50.00%" }
  */
 export function createDabbawala(name, area) {
   // Your code here
+  const deliveries = [];
+  let nextId = 1;
+
+  return { addDelivery, completeDelivery, getActiveDeliveries, getStats, reset };
+
+  function addDelivery(from, to) {
+    if (!from || !to) return -1;
+    const delivery = { id: nextId++, from, to, status: "pending" };
+    deliveries.push(delivery);
+    return delivery.id;
+  }
+
+  function completeDelivery(id) {
+    const delivery = deliveries.find(d => d.id === id);
+    if (!delivery || delivery.status === "completed") {
+      return false;
+    }
+    delivery.status = "completed";
+    return true;
+  }
+
+  function getActiveDeliveries(){
+    return deliveries.filter(d => d.status === "pending")
+  }
+
+  function getStats(){
+    const total = deliveries.length;
+    const completed = deliveries.filter(d => d.status === "completed")
+    const completedLength = completed.length;
+    const pending = deliveries.filter(d => d.status === "pending")
+    const pendingLength = pending.length;
+    const successRate = total === 0 ? "0.00%" : ((completedLength / total) * 100).toFixed(2) + "%"
+    return {
+      name,
+      area,
+      total,
+      completed: completedLength,
+      pending: pendingLength,
+      successRate
+    }
+  }
+
+  function reset(){
+    deliveries.length = 0;
+    nextId = 1;
+    return true;
+  }
 }

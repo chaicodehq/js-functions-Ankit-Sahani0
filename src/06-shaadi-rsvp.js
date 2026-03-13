@@ -40,23 +40,60 @@
  *     [{ name: "Rahul", side: "bride" }, { name: "Priya", side: "groom" }],
  *     guest => guest.side === "bride"
  *   )
- *   // => [{ name: "Rahul", side: "bride" }]
+//  *   // => [{ name: "Rahul", side: "bride" }]
  *
  *   handleRSVP({ name: "Amit", rsvp: "yes" }, g => `${g.name} is coming!`, g => `${g.name} declined`)
- *   // => "Amit is coming!"
+//  *   // => "Amit is coming!"
  */
 export function processGuests(guests, filterFn) {
   // Your code here
-}
+  if(!Array.isArray(guests) || typeof filterFn !== "function") {
+    return [];
+  }
+  const result = [];
+  for (const guest of guests) {
+    if (filterFn(guest)) {
+      result.push(guest);
+    }
+  }
+  return result;
 
+}
 export function notifyGuests(guests, notifyCallback) {
   // Your code here
+  if(!Array.isArray(guests) || typeof notifyCallback !== "function") {
+    return [];
+  }
+  const result =[];
+  for(const guest of guests){
+    result.push(notifyCallback(guest))
+  }
+  return result;
 }
 
 export function handleRSVP(guest, onAccept, onDecline) {
   // Your code here
+  if(guest === null || guest === undefined || typeof onAccept !== 'function' || typeof onDecline !== 'function') return null;
+  if(guest.rsvp === "yes") return onAccept(guest);
+  else if(guest.rsvp === "no") return onDecline(guest);
+  else return null;
 }
 
+/*
+4. transformGuestList(guests, ...transformFns)
+ *      - Takes guest array and any number of transform functions
+ *      - Each transformFn takes an array and returns a new array
+ *      - Apply transforms LEFT to RIGHT (first fn first)
+ *      - Return the final transformed array
+ *      - Agar guests not array, return []
+*/
 export function transformGuestList(guests, ...transformFns) {
   // Your code here
+  if(!Array.isArray(guests)) return []
+  let result = guests;
+  for(const fn of transformFns){
+    result = fn(result);
+  }
+  return result;
+
 }

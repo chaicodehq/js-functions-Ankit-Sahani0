@@ -42,20 +42,56 @@
  *
  *   const byRating = createSorter("rating", "desc");
  *   [{ rating: 3 }, { rating: 5 }].sort(byRating)
- *   // => [{ rating: 5 }, { rating: 3 }]
+//  *   // => [{ rating: 5 }, { rating: 3 }]
+1. createFilter(field, operator, value)
+ *      - Returns a FUNCTION that filters objects
+ *      - Operators: ">", "<", ">=", "<=", "==="
+ *      - e.g., createFilter("rating", ">=", 4) returns a function that
+ *        takes an object and returns true if object.rating >= 4
+ *      - Unknown operator => return function that always returns false
  */
 export function createFilter(field, operator, value) {
   // Your code here
+  switch (operator) {
+    case ">":
+      return (obj) => obj[field] > value;
+    case "<":
+      return (obj) => obj[field] < value;
+    case ">=":
+      return (obj) => obj[field] >= value;
+    case "<=":
+      return (obj) => obj[field] <= value;
+    case "===":
+      return (obj) => obj[field] === value;
+    default:
+      return () => false;
+  }
+
 }
 
 export function createSorter(field, order = "asc") {
   // Your code here
+  return (a, b) => {
+    if (a[field] < b[field]) return order === "asc" ? -1 : 1;
+    if (a[field] > b[field]) return order === "asc" ? 1 : -1;
+    return 0;
+  }
 }
 
 export function createMapper(fields) {
   // Your code here
+  return (obj) => {
+    const result = {};
+    for (const field of fields) {
+      result[field] = obj[field];
+    }
+    return result;
+  };
+
 }
 
 export function applyOperations(data, ...operations) {
   // Your code here
+  if (!Array.isArray(data)) return [];
+  return operations.reduce((acc, op) => op(acc), data);
 }

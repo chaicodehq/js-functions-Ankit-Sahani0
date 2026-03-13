@@ -39,19 +39,63 @@
  * @example
  *   const actionWriter = createDialogueWriter("action");
  *   actionWriter("Shah Rukh", "Raees")
- *   // => "Shah Rukh says: 'Tujhe toh main dekh lunga, Raees!'"
+//  *   // => "Shah Rukh says: 'Tujhe toh main dekh lunga, Raees!'"
  *
  *   const pricer = createTicketPricer(200);
  *   pricer("gold", true)  // => 200 * 1.5 * 1.3 = 390
+ * 
  */
 export function createDialogueWriter(genre) {
-  // Your code here
-}
+  const templates = {
+    action: (hero, villain) => `${hero} says: 'Tujhe toh main dekh lunga, ${villain}!'`,
+    romance: (hero, villain) => `${hero} whispers: '${villain}, tum mere liye sab kuch ho'`,
+    comedy: (hero, villain) => `${hero} laughs: '${villain} bhai, kya kar rahe ho yaar!'`,
+    drama: (hero, villain) => `${hero} cries: '${villain}, tune mera sab kuch cheen liya!'`
+  };
 
+  if (!genre || !Object.prototype.hasOwnProperty.call(templates, genre)) {
+    return null;
+  }
+
+  const templateFn = templates[genre];
+
+  return function (hero, villain) {
+    if (!hero || !villain) return "...";
+    return templateFn(hero, villain);
+  };
+}
 export function createTicketPricer(basePrice) {
   // Your code here
+  if(Number(basePrice) <= 0) return null;
+  const seatMultiplier = {silver: 1, gold: 1.5, platinum: 2}
+  
+  return function (seatType, isWeekend = false){
+    if(!seatMultiplier[seatType]) return null;
+    let price = basePrice * seatMultiplier[seatType];
+    if(isWeekend) price *= 1.3;
+    return Math.round(price);
+  }
+
 }
 
 export function createRatingCalculator(weights) {
-  // Your code here
+  if (!weights || typeof weights !== 'object') return null;
+
+  return function (scores) {
+    let sum = 0;
+    if (!scores || typeof scores !== 'object') {
+      return Math.round(sum * 10) / 10;
+    }
+
+    for (const key of Object.keys(weights)) {
+      const weight = weights[key];
+      if (typeof weight !== 'number') continue;
+      const score = scores[key];
+      if (typeof score !== 'number') continue;
+      sum += score * weight;
+    }
+
+    return Math.round(sum * 10) / 10;
+  };
+
 }

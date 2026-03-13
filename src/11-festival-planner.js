@@ -50,4 +50,61 @@
  */
 export function createFestivalManager() {
   // Your code here
+  let festivals = [];
+
+  function isValidDateString(d) {
+    if (typeof d !== "string") return false;
+    const parsed = Date.parse(d);
+    return !Number.isNaN(parsed);
+  }
+
+  const validTypes = ["religious", "national", "cultural"];
+
+  return {
+    addFestival(name, date, type) {
+      if (
+        typeof name !== "string" ||
+        name.trim() === "" ||
+        !isValidDateString(date) ||
+        !validTypes.includes(type) ||
+        festivals.some((f) => f.name === name)
+      ) {
+        return -1;
+      }
+      festivals.push({ name, date, type });
+      return festivals.length;
+    },
+
+    removeFestival(name) {
+      const idx = festivals.findIndex((f) => f.name === name);
+      if (idx === -1) return false;
+      festivals.splice(idx, 1);
+      return true;
+    },
+
+    getAll() {
+      return festivals.map((f) => ({ name: f.name, date: f.date, type: f.type }));
+    },
+
+    getByType(type) {
+      if (!validTypes.includes(type)) return [];
+      return festivals
+        .filter((f) => f.type === type)
+        .map((f) => ({ name: f.name, date: f.date, type: f.type }));
+    },
+
+    getUpcoming(currentDate, n = 3) {
+      if (!isValidDateString(currentDate) || typeof n !== "number" || n <= 0) return [];
+      const cutoff = Date.parse(currentDate);
+      return festivals
+        .filter((f) => Date.parse(f.date) >= cutoff)
+        .sort((a, b) => Date.parse(a.date) - Date.parse(b.date))
+        .slice(0, n)
+        .map((f) => ({ name: f.name, date: f.date, type: f.type }));
+    },
+
+    getCount() {
+      return festivals.length;
+    },
+  };
 }
